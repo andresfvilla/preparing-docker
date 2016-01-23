@@ -17,7 +17,7 @@ COPY mysql_secure.sh /myFiles
 RUN sudo service mysql start && sh /myFiles/mysql_secure.sh
 
 EXPOSE 13306
-
+EXPOSE 3306
 #phpmyadmin
 
 RUN sudo apt-get install php5-fpm php5-mysql php5-mcrypt -y
@@ -45,18 +45,24 @@ RUN sudo service apache2 stop
 EXPOSE 80
 
 RUN sudo service nginx restart
+RUN sudo service nginx start
+COPY services.sh /myFiles
+CMD ["sh", "myFiles/services.sh"]
 
 #Sencha Cmd
-#RUN wget http://cdn.sencha.com/cmd/6.0.2/no-jre/SenchaCmd-6.0.2-linux-amd64.sh.zip
-#RUN unzip SenchaCmd-6.0.2-linux-amd64.sh.zip
-#RUN sudo apt-get install default-jre
-#RUN ./SenchaCmd-6.0.2.14-linux-amd64.sh
 
+RUN apt-get install wget
+RUN apt-get install unzip
+RUN wget http://cdn.sencha.com/cmd/6.0.2/no-jre/SenchaCmd-6.0.2-linux-amd64.sh.zip -P /
+RUN unzip /SenchaCmd-6.0.2-linux-amd64.sh.zip
+RUN apt-get install default-jre -y
+RUN sh SenchaCmd-6.0.2.14-linux-amd64.sh -q 
 #alternative for sencha
 #RUN curl -o /cmd.run.zip http://cdn.sencha.com/cmd/6.0.2.14/SenchaCmd-6.0.2.14-linux-amd64.sh.zip && \
 #    unzip -p /cmd.run.zip > /cmd-install.run && \
 #    chmod +x /cmd-install.run && \
 #    /cmd-install.run -q -dir /opt/Sencha/Cmd/6.0.2.14 && \
 #    rm /cmd-install.run /cmd.run.zip
-
-#RUN source ~/.bash_profile
+RUN apt-get install git -y
+RUN git clone https://github.com/FIU-SCIS-Senior-Projects/MobileJudge8.git /MobileJudge8
+RUN sudo cp -rf /MobileJudge8/Code/client/build/production/* /usr/share/nginx/html/
